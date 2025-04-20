@@ -101,7 +101,11 @@ def mostrar_mapa(pedido_id: str):
                 new google.maps.Marker({{
                     position: ubicacion,
                     map: map,
-                    title: "Pedido en camino"
+                    title: "Tu pedido va en camino",
+                    icon: {{
+                        url: "https://cdn-icons-png.flaticon.com/512/2991/2991129.png",
+                        scaledSize: new google.maps.Size(45, 45)
+                    }}
                 }});
             }}
         </script>
