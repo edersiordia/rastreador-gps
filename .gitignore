@@ -1,2 +1,5 @@
 # Claves privadas a ignorar
 firebase_key.json
+
+# Ignorando los archivos del entorno virtual
+venv/
