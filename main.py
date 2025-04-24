@@ -3,6 +3,8 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 import firebase_admin
 from firebase_admin import credentials, db
+from datetime import datetime
+from zoneinfo import ZoneInfo  # Solo disponible en Python 3.9+
 
 app = FastAPI()
 
@@ -28,23 +30,35 @@ def actualizar_ubicacion(pedido_id: str, ubicacion: Ubicacion):
     })
     return {"mensaje": "Ubicación actualizada"}
 
+
 @app.post("/owntracks/{usuario}")
 async def recibir_de_owntracks(usuario: str, request: Request):
     data = await request.json()
+    msg_type = data.get("_type")
+
+    if msg_type != "location":
+        print(f"Ignorado mensaje tipo: {msg_type}")
+        return {"mensaje": f"Mensaje tipo {msg_type} ignorado"}
+
     lat = data.get("lat")
     lon = data.get("lon")
 
     if lat is None or lon is None:
         raise HTTPException(status_code=400, detail="Faltan coordenadas")
 
-    print(f"[OwnTracks] {usuario}: lat={lat}, lng={lon}")
+    timestamp = datetime.now(ZoneInfo("America/Mazatlan")).isoformat()
+
+    print(f"[OwnTracks] {usuario}: lat={lat}, lng={lon}, time={timestamp}")
 
     db.reference(f'ubicaciones/{usuario}').set({
         "lat": lat,
-        "lng": lon
+        "lng": lon,
+        "timestamp": timestamp
     })
 
     return {"mensaje": f"Ubicación de {usuario} recibida"}
+
+
 
 @app.get("/ubicacion/{pedido_id}")
 def obtener_ubicacion(pedido_id: str):
