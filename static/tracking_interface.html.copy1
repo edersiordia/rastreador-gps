@@ -60,7 +60,7 @@
   </div>
 
   <!-- Sección 2: Ver órdenes activas -->
-  <div class="section" style="min-height: 400px;">
+  <div class="section">
     <hr>
     <p>Envíos en progreso.</p>
     <table>
@@ -77,28 +77,16 @@
     </table>
   </div>
 
+  <hr>
 
 <!-- Sección 3: Marcar entregados -->
-<!-- Sección 3: Marcar entregados -->
-<div class="section" style="margin-top: 6rem;">
-    <div style="display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
-      
-      <!-- Izquierda: Marcar orden completada -->
-      <div style="display: flex; flex-direction: column; align-items: center;">
-        <p>Marcar orden completada</p>
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <input type="text" id="completeId" placeholder="ORDER ID" />
-          <button onclick="markCompleted()">ENVIAR</button>
-        </div>
-      </div>
+<div class="section">
+    <p>Marcar orden completada</p>
+    <input type="text" id="completeId" placeholder="ORDER ID" />
+    <button onclick="markCompleted()">ENVIAR</button>
   
-      <!-- Derecha: Marcar todas -->
-      <div style="display: flex; flex-direction: column; align-items: center;">
-        <p>Marcar todas completadas</p>
-        <button onclick="markAllCompleted()">ENVIAR</button>
-      </div>
-  
-    </div>
+    <p style="margin-top: 2rem;">Marcar todas las ordenes completadas</p>
+    <button onclick="markAllCompleted()">ENVIAR</button>
   </div>
   
   <script>
