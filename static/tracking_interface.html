@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BOSIO GPS PROJECT</title>
+  <style>
+    body {
+      background-color: #000;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      text-align: center;
+    }
+    input, button {
+      padding: 0.7rem;
+      margin: 0.5rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+    input {
+      width: 180px;
+      background-color: white;
+      color: black;
+      font-weight: bold;
+    }
+    button {
+      background-color: green;
+      color: white;
+      width: 120px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    table {
+      margin: 2rem auto;
+      border-collapse: collapse;
+      width: 80%;
+    }
+    th, td {
+      border: 1px solid white;
+      padding: 0.5rem;
+    }
+    th {
+      background-color: #111;
+    }
+    .section {
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>BOSIO GPS PROJECT</h1>
+
+  <!-- Sección 1: Crear orden -->
+  <div>
+    <input type="text" id="orderId" placeholder="ORDER ID" />
+    <input type="text" id="driver" placeholder="REPARTIDOR" />
+    <button onclick="createOrder()">ENVIAR</button>
+  </div>
+
+  <!-- Sección 2: Ver órdenes activas -->
+  <div class="section">
+    <hr>
+    <p>Envíos en progreso.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>ORDER ID</th>
+          <th>STATUS</th>
+          <th>URL</th>
+        </tr>
+      </thead>
+      <tbody id="ordersTable">
+        <!-- Órdenes activas se agregan aquí -->
+      </tbody>
+    </table>
+  </div>
+
+  <hr>
+
+<!-- Sección 3: Marcar entregados -->
+<div class="section">
+    <p>Marcar orden completada</p>
+    <input type="text" id="completeId" placeholder="ORDER ID" />
+    <button onclick="markCompleted()">ENVIAR</button>
+  
+    <p style="margin-top: 2rem;">Marcar todas las ordenes completadas</p>
+    <button onclick="markAllCompleted()">ENVIAR</button>
+  </div>
+  
+  <script>
+    const orders = [];
+  
+    function createOrder() {
+      const id = document.getElementById('orderId').value;
+      const driver = document.getElementById('driver').value;
+      if (!id || !driver) return alert("Completa todos los campos");
+  
+      fetch(`http://34.55.126.198:3000/ubicacion/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lat: 0, lng: 0 })
+      });
+  
+      const url = `http://34.55.126.198:3000/mapa/${id}`;
+      orders.push({ id, driver, status: 'IN PROGRESS', url });
+      renderOrders();
+  
+      // Limpiar inputs
+      document.getElementById('orderId').value = '';
+      document.getElementById('driver').value = '';
+    }
+  
+    function renderOrders() {
+      const tbody = document.getElementById('ordersTable');
+      tbody.innerHTML = '';
+      orders.forEach(order => {
+        const row = `<tr>
+          <td><strong>${order.id}</strong></td>
+          <td>${order.status}</td>
+          <td><a href="${order.url}" target="_blank">${order.url}</a></td>
+        </tr>`;
+        tbody.innerHTML += row;
+      });
+    }
+  
+    function markCompleted() {
+      const id = document.getElementById('completeId').value;
+      const order = orders.find(o => o.id === id);
+      if (order) {
+        fetch(`http://34.55.126.198:3000/entregado/${id}`, { method: 'POST' });
+        order.status = 'COMPLETED';
+        renderOrders();
+        document.getElementById('completeId').value = '';
+      } else {
+        alert("Orden no encontrada");
+      }
+    }
+  
+    function markAllCompleted() {
+      orders.forEach(order => {
+        fetch(`http://34.55.126.198:3000/entregado/${order.id}`, { method: 'POST' });
+        order.status = 'COMPLETED';
+      });
+      renderOrders();
+    }
+  </script>
+</body>
+</html>
+

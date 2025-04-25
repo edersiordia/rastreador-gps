@@ -5,6 +5,8 @@ import firebase_admin
 from firebase_admin import credentials, db
 from datetime import datetime
 from zoneinfo import ZoneInfo  # Solo disponible en Python 3.9+
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 app = FastAPI()
 
@@ -17,6 +19,19 @@ firebase_admin.initialize_app(cred, {
 class Ubicacion(BaseModel):
     lat: float
     lng: float
+
+#################################################################################################
+
+
+#Hostea  el archivo HTML directamente desde FastAPI sin nginx.
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/", response_class=FileResponse)
+def serve_tracking_interface():
+    return "static/tracking_interface.html"
+
+
+####################################################################################################
 
 @app.post("/ubicacion/{pedido_id}")
 def actualizar_ubicacion(pedido_id: str, ubicacion: Ubicacion):
