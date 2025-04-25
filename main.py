@@ -86,17 +86,78 @@ def obtener_ubicacion(pedido_id: str):
         raise HTTPException(status_code=404, detail="Ubicación no disponible")
     return ubicacion
 
+
+
+
+
+
+
 @app.post("/entregado/{pedido_id}")
 def marcar_entregado(pedido_id: str):
     db.reference(f'entregados/{pedido_id}').set(True)
     db.reference(f'ubicaciones/{pedido_id}').delete()
     return {"mensaje": "Pedido marcado como entregado"}
 
+
+
 @app.get("/mapa/{pedido_id}", response_class=HTMLResponse)
 def mostrar_mapa(pedido_id: str):
     entregado = db.reference(f'entregados/{pedido_id}').get()
+    
     if entregado is True:
-        return HTMLResponse(content="<h2>Pedido ya fue entregado</h2>", status_code=403)
+        html_entregado = """
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Pedido Entregado</title>
+            <style>
+                body {
+                    background: #ffffff;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    margin: 0;
+                    font-family: 'Poppins', sans-serif;
+                }
+                .mensaje {
+                    text-align: center;
+                }
+                .mensaje h1 {
+                    color: #00cc66;
+                    font-size: 3rem;
+                    margin-bottom: 1rem;
+                    animation: pulso 1.5s infinite;
+                }
+                .mensaje p {
+                    color: #333;
+                    font-size: 1.2rem;
+                }
+                @keyframes pulso {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.05); }
+                    100% { transform: scale(1); }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="mensaje">
+                <h1>¡Pedido Entregado!</h1>
+                <p>Gracias por confiar en nosotros.</p>
+            </div>
+        </body>
+        </html>
+        """
+        return HTMLResponse(content=html_entregado, status_code=200)
+
+
+
+
+
+
+
 
     html_content = f"""
     <!DOCTYPE html>
